@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FlowHub.Modules.Identity.Domain\FlowHub.Modules.Identity.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

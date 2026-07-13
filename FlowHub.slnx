@@ -1,2 +1,12 @@
 <Solution>
+  <Folder Name="/Host/">
+    <Project Path="src/Host/FlowHub.Host/FlowHub.Host.csproj" />
+  </Folder>
+  <Folder Name="/Modules/" />
+  <Folder Name="/Modules/Identity/">
+    <Project Path="src/Modules/Identity/FlowHub.Modules.Identity.Application/FlowHub.Modules.Identity.Application.csproj" />
+    <Project Path="src/Modules/Identity/FlowHub.Modules.Identity.Domain/FlowHub.Modules.Identity.Domain.csproj" />
+    <Project Path="src/Modules/Identity/FlowHub.Modules.Identity.Infrastructure/FlowHub.Modules.Identity.Infrastructure.csproj" />
+    <Project Path="src/Modules/Identity/FlowHub.Modules.Identity.Presentation/FlowHub.Modules.Identity.Presentation.csproj" />
+  </Folder>
 </Solution>
