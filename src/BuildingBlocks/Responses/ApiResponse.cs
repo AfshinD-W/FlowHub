@@ -1,4 +1,4 @@
-﻿namespace FlowHub.Modules.Identity.Presentation.ApiResponse
+﻿namespace BuildingBlocks.Responses
 {
     public class ApiResponse<T>
     {

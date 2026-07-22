@@ -1,4 +1,4 @@
-﻿namespace FlowHub.Modules.Identity.Application.Exceptions
+﻿namespace BuildingBlocks.Exceptions
 {
     public class ValidationException : Exception
     {

@@ -1,4 +1,5 @@
 using FlowHub.Modules.Identity.Infrastructure;
+using FlowHub.Modules.Identity.Presentation;
 using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,9 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddIdentityInfrastructure(builder.Configuration);
 
 var app = builder.Build();
+
+//Identity project
+app.AddIdentityPresentation();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

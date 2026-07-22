@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/BuildingBlocks.csproj" />
+  </Folder>
   <Folder Name="/Host/">
     <Project Path="src/Host/FlowHub.Host/FlowHub.Host.csproj" />
   </Folder>

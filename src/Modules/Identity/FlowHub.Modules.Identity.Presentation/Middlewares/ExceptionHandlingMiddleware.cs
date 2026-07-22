@@ -1,5 +1,5 @@
-﻿using FlowHub.Modules.Identity.Application.Exceptions;
-using FlowHub.Modules.Identity.Presentation.ApiResponse;
+﻿using BuildingBlocks.Exceptions;
+using BuildingBlocks.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Net;
@@ -9,9 +9,9 @@ namespace FlowHub.Modules.Identity.Presentation.Middlewares
     public class ExceptionHandlingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger _logger;
+        private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
-        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger logger)
+        public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
         {
             _next = next;
             _logger = logger;
