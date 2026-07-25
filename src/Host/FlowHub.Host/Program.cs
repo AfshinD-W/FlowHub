@@ -4,6 +4,12 @@ using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Identity project
+builder.Services.AddIdentityInfrastructure(builder.Configuration);
+
+builder.Services.AddControllers();
+
+//swager
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -14,9 +20,6 @@ builder.Services.AddSwaggerGen(options =>
         Description = "API documentation for FlowHub project",
     });
 });
-
-//Identity project
-builder.Services.AddIdentityInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
@@ -35,5 +38,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapControllers();
 
 app.Run();
