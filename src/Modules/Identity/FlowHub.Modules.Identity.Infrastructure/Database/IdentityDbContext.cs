@@ -7,5 +7,7 @@ namespace FlowHub.Modules.Identity.Infrastructure.Database
     public class IdentityDbContext : IdentityDbContext<User, Role, string>
     {
         public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options) { }
+
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
     }
 }
