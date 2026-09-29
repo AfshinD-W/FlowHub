@@ -2,7 +2,7 @@
 {
     public interface ITokenService
     {
-        string GenerateAccessToken(
+        (string Token, DateTime ExpiresAt) GenerateAccessToken(
             string userId,
             string userName,
             IEnumerable<string> roles

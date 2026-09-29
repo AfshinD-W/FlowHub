@@ -1,4 +1,5 @@
 ﻿using BuildingBlocks.Responses;
+using FlowHub.Modules.Identity.Application.DTO.Login;
 using FlowHub.Modules.Identity.Application.DTO.Register;
 using FlowHub.Modules.Identity.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ namespace FlowHub.Modules.Identity.Presentation.Controllers
     public class AuthController : ControllerBase
     {
         private const string SuccessRegister = "User registered success fully.";
+        private const string SuccessLogin = "User login was success fully.";
 
         private readonly IAuthService _authService;
 
@@ -19,14 +21,27 @@ namespace FlowHub.Modules.Identity.Presentation.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterAsync(RegisterRequestDto dto)
+        public async Task<IActionResult> RegisterAsync(RegisterRequestDto requestModel)
         {
-            await _authService.RegisterAsync(dto);
+            await _authService.RegisterAsync(requestModel);
 
             return Ok(new ApiResponse<object>()
             {
                 Success = true,
                 Message = SuccessRegister
+            });
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> LoginAsync(LoginRequestDto requestModel)
+        {
+            LoginResponseDto response = await _authService.LoginAsync(requestModel);
+
+            return Ok(new ApiResponse<object>()
+            {
+                Success = true,
+                Message = SuccessLogin,
+                Data = response
             });
         }
     }

@@ -19,7 +19,7 @@ namespace FlowHub.Modules.Identity.Infrastructure.Identity.Services
         }
 
 
-        public string GenerateAccessToken(string userId, string userName, IEnumerable<string> roles)
+        public (string Token, DateTime ExpiresAt) GenerateAccessToken(string userId, string userName, IEnumerable<string> roles)
         {
             List<Claim> claimes =
             [
@@ -37,15 +37,17 @@ namespace FlowHub.Modules.Identity.Infrastructure.Identity.Services
                 key,
                 SecurityAlgorithms.HmacSha256);
 
+            DateTime expires = DateTime.UtcNow.AddMinutes(_jwtOptions.AccessTokenExpirationMinutes);
+
             var token = new JwtSecurityToken(
-                issuer : _jwtOptions.Issuer,
-                audience : _jwtOptions.Audience,
+                issuer: _jwtOptions.Issuer,
+                audience: _jwtOptions.Audience,
                 claims: claimes,
-                expires: DateTime.UtcNow.AddMinutes(_jwtOptions.AccessTokenExpirationMinutes),
+                expires: expires,
                 signingCredentials: credentials
                 );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return (new JwtSecurityTokenHandler().WriteToken(token), expires);
         }
 
         public string GenerateRefreshToken()
