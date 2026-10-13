@@ -44,5 +44,18 @@ namespace FlowHub.Modules.Identity.Presentation.Controllers
                 Data = response
             });
         }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshTokenAsync(string refreshToken)
+        {
+            LoginResponseDto response = await _authService.RefreshTokenAsync(refreshToken);
+
+            return Ok(new ApiResponse<object>()
+            {
+                Success = true,
+                Message = SuccessLogin,
+                Data = response
+            });
+        }
     }
 }

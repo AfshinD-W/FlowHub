@@ -5,12 +5,15 @@ using FlowHub.Modules.Identity.Application.Interfaces;
 using FlowHub.Modules.Identity.Infrastructure.Database;
 using FlowHub.Modules.Identity.Infrastructure.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace FlowHub.Modules.Identity.Infrastructure.Identity.Services
 {
     public class AuthService : IAuthService
     {
         private const string InvalidCredentialsMessage = "User name or password is wrong!";
+        private const string InvalidRefreshTokenMessage = "Invalid refresh token!";
+        private const string UserNameNotFound = "UserName is null.";
 
         private readonly UserManager<User> _userManager;
         private readonly ITokenService _tokenService;
@@ -54,13 +57,7 @@ namespace FlowHub.Modules.Identity.Infrastructure.Identity.Services
 
             string refreshToken = _tokenService.GenerateRefreshToken();
 
-            RefreshToken refreshTokenEntity = new()
-            {
-                Token = refreshToken,
-                CreatedAt = DateTime.UtcNow,
-                ExpiresAt = DateTime.UtcNow.AddDays(15),
-                UserId = user.Id,
-            };
+            RefreshToken refreshTokenEntity = CreateRefreshToken(user.Id);
 
             await _identityDbContext.RefreshTokens.AddAsync(refreshTokenEntity);
             await _identityDbContext.SaveChangesAsync();
@@ -73,9 +70,53 @@ namespace FlowHub.Modules.Identity.Infrastructure.Identity.Services
             };
         }
 
-        public Task RefreshTokenAsync()
+        public async Task<LoginResponseDto> RefreshTokenAsync(string refreshToken)
         {
-            throw new NotImplementedException();
+            RefreshToken storedToken = await _identityDbContext.RefreshTokens.Include(r => r.User).SingleOrDefaultAsync(r => r.Token == refreshToken)
+                ?? throw new UnauthorizedException(InvalidRefreshTokenMessage);
+
+
+            if (storedToken.RevokedAt is not null)
+            {
+                IEnumerable<RefreshToken> refreshTokens = await _identityDbContext.RefreshTokens.Where(r => r.UserId == storedToken.UserId).ToListAsync();
+
+                DateTime now = DateTime.UtcNow;
+
+                foreach (RefreshToken token in refreshTokens)
+                {
+                    token.RevokedAt = now;
+                }
+
+                await _identityDbContext.SaveChangesAsync();
+
+                throw new UnauthorizedException(InvalidRefreshTokenMessage);
+            }
+
+
+            if (storedToken.ExpiresAt <= DateTime.UtcNow)
+                throw new UnauthorizedException(InvalidRefreshTokenMessage);
+
+            if (storedToken.User.UserName is null)
+                throw new NotFoundException(UserNameNotFound);
+
+            IEnumerable<string> userRoles = await _userManager.GetRolesAsync(storedToken.User);
+
+            var (accessToken, expiery) = _tokenService.GenerateAccessToken(storedToken.User.Id, storedToken.User.UserName, userRoles);
+
+            RefreshToken newRefreshToken = CreateRefreshToken(storedToken.User.Id);
+
+            storedToken.RevokedAt = DateTime.UtcNow;
+            storedToken.ReplacedByToken = newRefreshToken.Token;
+            _identityDbContext.RefreshTokens.Add(newRefreshToken);
+
+            await _identityDbContext.SaveChangesAsync();
+
+            return new LoginResponseDto()
+            {
+                Token = accessToken,
+                TokenExpiery = expiery,
+                RefreshToken = newRefreshToken.Token,
+            };
         }
 
         public Task LogoutAsync()
@@ -86,6 +127,19 @@ namespace FlowHub.Modules.Identity.Infrastructure.Identity.Services
         public Task ForgotPasswordAsync()
         {
             throw new NotImplementedException();
+        }
+
+        private RefreshToken CreateRefreshToken(string userId)
+        {
+            DateTime now = DateTime.UtcNow;
+
+            return new()
+            {
+                Token = _tokenService.GenerateRefreshToken(),
+                CreatedAt = now,
+                ExpiresAt = now.AddDays(15),
+                UserId = userId,
+            };
         }
     }
 }

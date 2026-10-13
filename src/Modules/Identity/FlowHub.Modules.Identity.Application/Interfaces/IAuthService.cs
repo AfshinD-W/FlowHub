@@ -7,7 +7,7 @@ namespace FlowHub.Modules.Identity.Application.Interfaces
     {
         Task RegisterAsync(RegisterRequestDto requestModel);
         Task<LoginResponseDto> LoginAsync(LoginRequestDto requestModel);
-        Task RefreshTokenAsync();
+        Task<LoginResponseDto> RefreshTokenAsync(string refreshToken);
         Task LogoutAsync();
         Task ForgotPasswordAsync();
     }
